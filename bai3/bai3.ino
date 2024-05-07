@@ -39,7 +39,7 @@ void loop() {
     String payload;
     serializeJson(doc, payload);
     // http.begin(client, serverAddress, serverPort, "/light", false); // Specify the endpoint
-    http.begin(client, "http://172.31.10.20:3000/light"); // Specify the endpoint
+    http.begin(client, "http://172.31.10.20:3000/data"); // Specify the endpoint
     http.addHeader("Content-Type", "application/json");
 
     int httpCode = http.POST(payload);
