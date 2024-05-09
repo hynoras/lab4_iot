@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const sensorDataSchema = new mongoose.Schema({
   deviceid: {
@@ -7,7 +8,7 @@ const sensorDataSchema = new mongoose.Schema({
   },
   sensorid: {
     type: Schema.Types.ObjectId,
-    ref: 'SensorTypw'
+    ref: 'SensorType'
   },
   timestamp: {
     type: Date,

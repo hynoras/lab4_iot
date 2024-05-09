@@ -3,55 +3,59 @@
 #include <ArduinoJson.h>
 #include <Wire.h>
 #include <BH1750.h>
+#include <DHT.h>
 
-BH1750 lightMeter(0x23); // I2C address 0x23
+#define DHTPIN D3     // Pin connected to the DHT22 sensor
+#define DHTTYPE DHT22 // DHT type is DHT22
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// BH1750 lightMeter(0x23); // I2C address 0x23
 
 const char* ssid = "UiTiOt-E3.1";
 const char* password = "UiTiOtAP";
-const char* serverAddress = "http://172.31.10.20";
-const int serverPort = 3000; // Your server port
+// const char* serverAddress = "http://172.31.10.20";
+// const int serverPort = 3000;
 
-const int ledPin1 = D6;
-const int ledPin2 = D7;
-const int ledPin3 = D8;
 
 void setup() {
   Serial.begin(115200);
   Wire.begin();
-  lightMeter.begin();
+  // lightMeter.begin();
+  dht.begin();
 
-  pinMode(ledPin1, OUTPUT);
-  pinMode(ledPin2, OUTPUT);
-  pinMode(ledPin3, OUTPUT);
   connectToWiFi();
 }
 
 void loop() {
-  float lightIntensity = lightMeter.readLightLevel();
+  // float lightIntensity = lightMeter.readLightLevel();
+  float temperature = dht.readTemperature();
   
   WiFiClient client;
   HTTPClient http;
 
   if (WiFi.status() == WL_CONNECTED) {
-    DynamicJsonDocument doc(200);
-    doc["light"] = lightIntensity;
-    
+    DynamicJsonDocument doc(200);  
+    // doc["value"] = lightIntensity;
+    doc["value"] = temperature;
+    doc["devicename"] = "Wemos D1 R2"; // Update with your device name
+    // doc["sensorname"] = "BP1750"; // Update with your sensor name
+    doc["sensorname"] = "DHT22"; // Update with your sensor name
+
     String payload;
     serializeJson(doc, payload);
     // http.begin(client, serverAddress, serverPort, "/light", false); // Specify the endpoint
-    http.begin(client, "http://172.31.10.20:3000/data"); // Specify the endpoint
+    http.begin(client, "http://172.31.10.20:3000/data/save"); // Specify the endpoint
     http.addHeader("Content-Type", "application/json");
 
     int httpCode = http.POST(payload);
     Serial.println(httpCode);
     if (httpCode > 0) {
-      if (httpCode == HTTP_CODE_OK) {
+      if (httpCode == HTTP_CODE_CREATED) {
         String response = http.getString();
         Serial.println("Server response: " + response);
-        DynamicJsonDocument respDoc(200);
+        DynamicJsonDocument respDoc(201);
         deserializeJson(respDoc, response);
-        int numLights = respDoc["data"]["numLights"];
-        updateLEDs(numLights);
       } else {
         Serial.println("HTTP error: " + String(httpCode));
       }
@@ -65,7 +69,7 @@ void loop() {
     connectToWiFi();
   }
 
-  delay(5000); // Delay for 5 seconds
+  delay(20000); // Delay for 5 seconds
 }
 
 
@@ -78,8 +82,3 @@ void connectToWiFi() {
   Serial.println("Connected to WiFi");
 }
 
-void updateLEDs(int numLights) {
-  digitalWrite(ledPin1, numLights >= 1 ? HIGH : LOW);
-  digitalWrite(ledPin2, numLights >= 2 ? HIGH : LOW);
-  digitalWrite(ledPin3, numLights >= 3 ? HIGH : LOW);
-}

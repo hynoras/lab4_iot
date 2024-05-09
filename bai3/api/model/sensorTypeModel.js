@@ -1,5 +1,5 @@
-// models/SensorType.js
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const sensorTypeSchema = new mongoose.Schema({
   deviceid: {

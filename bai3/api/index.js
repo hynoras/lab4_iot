@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const sensorRoutes = require('./routes/sensorRoutes');
+const sensorRoutes = require('./route/sensorRoute');
 
 const app = express();
 
@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Routes
-app.use("/sensor",sensorRoutes);
+app.use("/data",sensorRoutes);
 
 mongoose
   .connect(
@@ -21,6 +21,7 @@ mongoose
     console.error("Could not connect to MongoDB...");
   });
 
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
