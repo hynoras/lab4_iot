@@ -1,0 +1,17 @@
+.device-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .device-name {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .device-status {
+    font-style: italic;
+    color: #888;
+  }
